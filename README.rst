@@ -44,10 +44,10 @@ You can install "pytest-tempdir" via `pip`_ from `PyPI`_::
 Usage
 -----
 
-* Simply define a `pytest_tempdir_basename` function on your ``conftest.py` which returns 
-  a string to definethe basename or pass `--tempdir-basename`.
+* Simply define a ``pytest_tempdir_basename`` function on your ``conftest.py`` 
+  which returns a string to define the basename or pass ``--tempdir-basename``.
 * If you wish to leave the temporary directory intact for further inspection 
-  after the tests suite ends, pass `--tempdir-no-clean`.
+  after the tests suite ends, pass ``--tempdir-no-clean``.
 
 
 Contributing
