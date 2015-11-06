@@ -62,7 +62,9 @@ def pytest_addoption(parser):
                     help='The predictable temporary directory base name. '
                          'Defaults to the current directory name if not '
                          'passed as a CLI parameter and if not defined '
-                         'using the tempdir_basename session scoped fixture')
+                         'using the tempdir_basename session scoped fixture. '
+                         'If the temporary directory exists when the test '
+                         'session starts, IT WILL BE WIPED!')
     group.addoption('--tempdir-no-clean',
                     default=False,
                     action='store_true',
@@ -107,6 +109,9 @@ def pytest_configure(config):
     mpatch = monkeypatch()
     temproot = py.path.local.get_temproot()  # pylint: disable=no-member
     tempdir = temproot.join(basename).ensure(dir=True).realpath()
+    if tempdir.exists():
+        log.warning('Removing stale tempdir: %s', tempdir.strpath)
+        tempdir.remove(rec=True, ignore_errors=True)
     mpatch.setattr(config, '_tempdir', tempdir, raising=False)
     config._cleanup.extend([
         mpatch.undo,
