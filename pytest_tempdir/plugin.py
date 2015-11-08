@@ -108,11 +108,18 @@ def pytest_configure(config):
 
     mpatch = monkeypatch()
     temproot = py.path.local.get_temproot()  # pylint: disable=no-member
-    tempdir = temproot.join(basename).ensure(dir=True).realpath()
+    # Let's get the full real path to the tempdir
+    tempdir = temproot.join(basename).realpath()
     if tempdir.exists():
+        # If it exists, it's a stale tempdir. Remove it
         log.warning('Removing stale tempdir: %s', tempdir.strpath)
         tempdir.remove(rec=True, ignore_errors=True)
+    # Make sure the tempdir is created
+    tempdir.ensure(dir=True)
+    # Store a reference the tempdir for cleanup purposes when ending the test
+    # session
     mpatch.setattr(config, '_tempdir', tempdir, raising=False)
+    # Register the cleanup actions
     config._cleanup.extend([
         mpatch.undo,
         partial(clean_up_tempdir, config)

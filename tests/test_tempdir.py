@@ -54,6 +54,8 @@ def test_tempdir_hook(testdir):
 
 
 def test_tempdir_no_clean(testdir):
+    tempdir_path = py.path.local.get_temproot().join('bar').realpath().strpath  # pylint: disable=no-member
+    # Let' assert it does not yet exist
     with open(os.path.join(testdir.tmpdir.strpath, 'conftest.py'), 'w') as wfh:
         wfh.write(textwrap.dedent('''
             import pytest
@@ -63,17 +65,21 @@ def test_tempdir_no_clean(testdir):
         '''))
 
     testdir.makepyfile('''
-        def test_tempdir_hook(tempdir):
+        import os
+
+        def test_tempdir_no_clean(tempdir):
             assert tempdir.strpath.endswith('bar')
+            assert os.path.isdir(tempdir.realpath().strpath)
     ''')
 
-    result = testdir.runpytest('-v', '--tempdir-no-clean')
+    result = testdir.runpytest('-v', '--tempdir-no-clean', '-vvv')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
-        '*::test_tempdir_hook PASSED',
+        '*::test_tempdir_no_clean PASSED',
     ])
 
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
-    assert os.path.isdir(py.path.local.get_temproot().join('bar').realpath().strpath)  # pylint: disable=no-member
+    # Assert that the tempdir was left untouched after the tests suite ended
+    assert os.path.isdir(tempdir_path) is True
