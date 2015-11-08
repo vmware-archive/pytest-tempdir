@@ -44,7 +44,7 @@ setup(
     author_email='pedro@algarvio.me',
     maintainer='Pedro Algarvio',
     maintainer_email='pedro@algarvio.me',
-    license='MIT',
+    license='Apache Software License 2.0',
     url='https://github.com/saltstack/pytest-tempdir',
     description='Predictable and repeatable tempdir support.',
     long_description=LONG_DESCRIPTION,
