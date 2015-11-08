@@ -66,6 +66,21 @@ Issues
 
 If you encounter any problems, please `file an issue`_ along with a detailed description.
 
+Changelog
+---------
+
+v2015.11.8:
+
+  * Fix stale tempdir cleanup logic
+
+v2015.11.6:
+
+  * Wipe the tempdir directory on test session start if it exists
+
+v2015.11.4:
+
+  + First working release
+
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`@hackebrot`: https://github.com/hackebrot
 .. _`cookiecutter-pytest-plugin`: https://github.com/pytest-dev/cookiecutter-pytest-plugin
