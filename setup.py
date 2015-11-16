@@ -30,7 +30,7 @@ def read(fname):
 
 # Version info -- read without importing
 _LOCALS = {}
-with open(os.path.join(SETUP_DIRNAME, 'pytest_tempdir', 'version.py')) as rfh:
+with codecs.open(os.path.join(SETUP_DIRNAME, 'pytest_tempdir', 'version.py'), encoding='utf-8') as rfh:
     exec(rfh.read(), None, _LOCALS)  # pylint: disable=exec-used
 
 
