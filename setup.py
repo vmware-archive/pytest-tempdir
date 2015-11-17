@@ -31,7 +31,12 @@ def read(fname):
 # Version info -- read without importing
 _LOCALS = {}
 with codecs.open(os.path.join(SETUP_DIRNAME, 'pytest_tempdir', 'version.py'), encoding='utf-8') as rfh:
-    exec(rfh.read(), None, _LOCALS)  # pylint: disable=exec-used
+    contents = rfh.read()
+    try:
+        exec(contents, None, _LOCALS)  # pylint: disable=exec-used
+    except SyntaxError:
+        # SyntaxError: encoding declaration in Unicode string
+        exec(contents.encode('utf-8'), None, _LOCALS)  # pylint: disable=exec-used
 
 
 VERSION = _LOCALS['__version__']
