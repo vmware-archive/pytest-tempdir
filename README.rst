@@ -69,6 +69,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2015.11.17
+~~~~~~~~~~~
+
+* Fix more encoding issues when running setup and the system locale is not set
+
 v2015.11.16
 ~~~~~~~~~~~
 
