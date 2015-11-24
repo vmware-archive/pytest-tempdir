@@ -78,7 +78,7 @@ def pytest_report_header(config):
     return 'tempdir: {0}'.format(config._tempdir.strpath)
 
 
-class TempDir:
+class TempDir(object):
     def __init__(self, config):
         self.config = config
         self._prepare()
@@ -106,7 +106,7 @@ class TempDir:
         tempdir.ensure(dir=True)
         # Store a reference the tempdir for cleanup purposes when ending the test
         # session
-        mpatch.setattr(self.config, '_tempdir', tempdir, raising=False)
+        mpatch.setattr(self.config, '_tempdir', self, raising=False)
         # Register the cleanup actions
         self.config._cleanup.extend([
             mpatch.undo,
@@ -131,10 +131,19 @@ class TempDir:
         counter = 0
         while True:
             newdir = self.tempdir.join('{0}{1}'.format(path, counter))
+            log.warning('New Dir: %s', newdir)
             if newdir.exists() and use_existing is False:
                 counter += 1
                 continue
             return newdir.ensure(dir=True)
+
+    def __getattribute__(self, name):
+        try:
+            return object.__getattribute__(self, name)
+        except AttributeError:
+            return getattr(self.tempdir, name)
+
+
 
 
 def pytest_configure(config):
