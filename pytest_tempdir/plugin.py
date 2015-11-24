@@ -78,52 +78,71 @@ def pytest_report_header(config):
     return 'tempdir: {0}'.format(config._tempdir.strpath)
 
 
+class TempDir:
+    def __init__(self, config):
+        self.config = config
+        self._prepare()
+
+    def _prepare(self):
+        basename = None
+        cli_tempdir_basename = self.config.getvalue('tempdir_basename')
+        if cli_tempdir_basename is not None:
+            basename = cli_tempdir_basename
+        else:
+            # Let's see if we have a pytest_tempdir_basename hook implementation
+            basename = self.config.hook.pytest_tempdir_basename()
+        if basename is None:
+            # If by now, basename is still None, use the current directory name
+            basename = os.path.basename(py.path.local().strpath)  # pylint: disable=no-member
+        mpatch = monkeypatch()
+        temproot = py.path.local.get_temproot()  # pylint: disable=no-member
+        # Let's get the full real path to the tempdir
+        tempdir = temproot.join(basename).realpath()
+        if tempdir.exists():
+            # If it exists, it's a stale tempdir. Remove it
+            log.warning('Removing stale tempdir: %s', tempdir.strpath)
+            tempdir.remove(rec=True, ignore_errors=True)
+        # Make sure the tempdir is created
+        tempdir.ensure(dir=True)
+        # Store a reference the tempdir for cleanup purposes when ending the test
+        # session
+        mpatch.setattr(self.config, '_tempdir', tempdir, raising=False)
+        # Register the cleanup actions
+        self.config._cleanup.extend([
+            mpatch.undo,
+            self._clean_up_tempdir
+        ])
+        self.tempdir = tempdir
+
+    def _clean_up_tempdir(self):
+        '''
+        Clean up temporary directory
+        '''
+        if self.config.getvalue('--tempdir-no-clean') is False:
+            log.debug('Cleaning up the tempdir: %s', self.tempdir.strpath)
+            try:
+                self.tempdir.remove(rec=True, ignore_errors=True)
+            except py.error.ENOENT:  # pylint: disable=no-member
+                pass
+        else:
+            log.debug('No cleaning up tempdir: %s', self.tempdir.strpath)
+
+    def mkdir(self, path, use_existing=False):
+        counter = 0
+        while True:
+            newdir = self.tempdir.join('{0}{1}'.format(path, counter))
+            if newdir.exists() and use_existing is False:
+                counter += 1
+                continue
+            return newdir.ensure(dir=True)
+
+
 def pytest_configure(config):
     '''
     Configure the tempdir
     '''
-    basename = None
-    cli_tempdir_basename = config.getvalue('tempdir_basename')
-    if cli_tempdir_basename is not None:
-        basename = cli_tempdir_basename
-    else:
-        # Let's see if we have a pytest_tempdir_basename hook implementation
-        basename = config.hook.pytest_tempdir_basename()
-    if basename is None:
-        # If by now, basename is still None, use the current directory name
-        basename = os.path.basename(py.path.local().strpath)  # pylint: disable=no-member
-
-    def clean_up_tempdir(config):
-        '''
-        Clean up temporary directory
-        '''
-        if config.getvalue('--tempdir-no-clean') is False:
-            log.debug('Cleaning up the tempdir: %s', config._tempdir.strpath)
-            try:
-                config._tempdir.remove(rec=True, ignore_errors=True)
-            except py.error.ENOENT:  # pylint: disable=no-member
-                pass
-        else:
-            log.debug('No cleaning up tempdir: %s', config._tempdir.strpath)
-
-    mpatch = monkeypatch()
-    temproot = py.path.local.get_temproot()  # pylint: disable=no-member
-    # Let's get the full real path to the tempdir
-    tempdir = temproot.join(basename).realpath()
-    if tempdir.exists():
-        # If it exists, it's a stale tempdir. Remove it
-        log.warning('Removing stale tempdir: %s', tempdir.strpath)
-        tempdir.remove(rec=True, ignore_errors=True)
-    # Make sure the tempdir is created
-    tempdir.ensure(dir=True)
-    # Store a reference the tempdir for cleanup purposes when ending the test
-    # session
-    mpatch.setattr(config, '_tempdir', tempdir, raising=False)
-    # Register the cleanup actions
-    config._cleanup.extend([
-        mpatch.undo,
-        partial(clean_up_tempdir, config)
-    ])
+    # Prep tempdir
+    TempDir(config)
 
 
 @pytest.fixture(scope='session')
