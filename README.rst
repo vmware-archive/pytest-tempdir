@@ -69,6 +69,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2015.11.29
+~~~~~~~~~~~
+
+* Append a counter value to existing directory names
+
 v2015.11.17
 ~~~~~~~~~~~
 

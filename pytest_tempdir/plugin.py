@@ -144,8 +144,6 @@ class TempDir(object):
             return getattr(self.tempdir, name)
 
 
-
-
 def pytest_configure(config):
     '''
     Configure the tempdir
