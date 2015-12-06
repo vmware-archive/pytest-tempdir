@@ -129,13 +129,13 @@ class TempDir(object):
             log.debug('No cleaning up tempdir: %s', self.tempdir.strpath)
 
     def mkdir(self, path, use_existing=False):
-        if path not in self.counters:
-            self.counters[path] = 0
+        abspath = self.tempdir.join(path)
+        if abspath not in self.counters:
+            self.counters[abspath] = 0
         while True:
-            count = self.counters[path]
-            newdir = self.tempdir.join('{0}{1}'.format(path, self.counters[path]))
+            newdir = self.tempdir.join('{0}{1}'.format(path, self.counters[abspath]))
             if newdir.exists() and use_existing is False:
-                self.counters[path] += 1
+                self.counters[abspath] += 1
                 continue
             log.warning('New Dir: %s', newdir)
             return newdir.ensure(dir=True)
