@@ -69,6 +69,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2015.12.6
+~~~~~~~~~~
+
+* Each absolute path gets it's own counter
+
 v2015.11.29
 ~~~~~~~~~~~
 
