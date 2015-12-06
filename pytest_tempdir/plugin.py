@@ -84,6 +84,7 @@ class TempDir(object):
         self._prepare()
 
     def _prepare(self):
+        self.counters = {}
         basename = None
         cli_tempdir_basename = self.config.getvalue('tempdir_basename')
         if cli_tempdir_basename is not None:
@@ -128,13 +129,15 @@ class TempDir(object):
             log.debug('No cleaning up tempdir: %s', self.tempdir.strpath)
 
     def mkdir(self, path, use_existing=False):
-        counter = 0
+        if path not in self.counters:
+            self.counters[path] = 0
         while True:
-            newdir = self.tempdir.join('{0}{1}'.format(path, counter))
-            log.warning('New Dir: %s', newdir)
+            count = self.counters[path]
+            newdir = self.tempdir.join('{0}{1}'.format(path, self.counters[path]))
             if newdir.exists() and use_existing is False:
-                counter += 1
+                self.counters[path] += 1
                 continue
+            log.warning('New Dir: %s', newdir)
             return newdir.ensure(dir=True)
 
     def __getattribute__(self, name):
