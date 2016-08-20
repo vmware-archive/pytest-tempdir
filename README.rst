@@ -69,6 +69,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2016.8.20
+~~~~~~~~~~
+
+* Support pytest 2.x and 3.x
+
 v2015.12.6
 ~~~~~~~~~~
 
