@@ -21,7 +21,10 @@ import py
 
 # Import pytest libs
 import pytest
-from _pytest.monkeypatch import monkeypatch
+try:
+    from _pytest.monkeypatch import MonkeyPatch
+except ImportError:
+    from _pytest.monkeypatch import monkeypatch as MonkeyPatch
 
 log = logging.getLogger('pytest.tempdir')
 
@@ -95,7 +98,7 @@ class TempDir(object):
         if basename is None:
             # If by now, basename is still None, use the current directory name
             basename = os.path.basename(py.path.local().strpath)  # pylint: disable=no-member
-        mpatch = monkeypatch()
+        mpatch = MonkeyPatch()
         temproot = py.path.local.get_temproot()  # pylint: disable=no-member
         # Let's get the full real path to the tempdir
         tempdir = temproot.join(basename).realpath()
