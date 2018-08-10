@@ -22,8 +22,8 @@ This `Pytest`_ plugin was generated with `Cookiecutter`_ along with `@hackebrot`
 Features
 --------
 
-* Adds support for a predictable and repeatable temporary directory through the 
-  `tempdir` fixture which gets cleaned up in the end of the test run 
+* Adds support for a predictable and repeatable temporary directory through the
+  `tempdir` fixture which gets cleaned up in the end of the test run
   session(this behaviour can be disabled).
 
 
@@ -44,9 +44,9 @@ You can install "pytest-tempdir" via `pip`_ from `PyPI`_::
 Usage
 -----
 
-* Simply define a ``pytest_tempdir_basename`` function on your ``conftest.py`` 
+* Simply define a ``pytest_tempdir_basename`` function on your ``conftest.py``
   which returns a string to define the basename or pass ``--tempdir-basename``.
-* If you wish to leave the temporary directory intact for further inspection 
+* If you wish to leave the temporary directory intact for further inspection
   after the tests suite ends, pass ``--tempdir-no-clean``.
 
 
@@ -68,6 +68,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 
 Changelog
 ---------
+
+v2018.8.11
+~~~~~~~~~~
+
+* Lower log call logging level
 
 v2016.8.20
 ~~~~~~~~~~

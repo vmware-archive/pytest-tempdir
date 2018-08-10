@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
     :codeauthor: :email:`Pedro Algarvio (pedro@algarvio.me)`
-    :copyright: © 2015 by the SaltStack Team, see AUTHORS for more details.
+    :copyright: © 2015-2018 by the SaltStack Team, see AUTHORS for more details.
     :license: Apache 2.0, see LICENSE for more details.
 
 
@@ -140,7 +140,7 @@ class TempDir(object):
             if newdir.exists() and use_existing is False:
                 self.counters[abspath] += 1
                 continue
-            log.warning('New Dir: %s', newdir)
+            log.info('New Dir: %s', newdir)
             return newdir.ensure(dir=True)
 
     def __getattribute__(self, name):
