@@ -140,7 +140,7 @@ class TempDir(object):
             if newdir.exists() and use_existing is False:
                 self.counters[abspath] += 1
                 continue
-            log.info('New Dir: %s', newdir)
+            log.debug('New Dir: %s', newdir)
             return newdir.ensure(dir=True)
 
     def __getattribute__(self, name):
