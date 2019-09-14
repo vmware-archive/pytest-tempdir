@@ -13,7 +13,9 @@
 # Import python libs
 from __future__ import absolute_import
 import os
+import sys
 import logging
+import tempfile
 from functools import partial
 
 # Import py libs
@@ -21,6 +23,7 @@ import py
 
 # Import pytest libs
 import pytest
+from _pytest.pathlib import Path
 try:
     from _pytest.monkeypatch import MonkeyPatch
 except ImportError:
@@ -33,6 +36,12 @@ class Hooks(object):  # pylint: disable=too-few-public-methods
     '''
     Class to add new hooks to pytest
     '''
+
+    @pytest.hookspec(firstresult=True)
+    def pytest_tempdir_temproot(self):
+        '''
+        An alternate way to define the temporary directory root.
+        '''
 
     @pytest.hookspec(firstresult=True)
     def pytest_tempdir_basename(self):
@@ -99,7 +108,11 @@ class TempDir(object):
             # If by now, basename is still None, use the current directory name
             basename = os.path.basename(py.path.local().strpath)  # pylint: disable=no-member
         mpatch = MonkeyPatch()
-        temproot = py.path.local.get_temproot()  # pylint: disable=no-member
+
+        temproot = self.config.hook.pytest_tempdir_temproot()
+        if not isinstance(temproot, Path):
+            temproot = py.path.local(temproot)
+
         # Let's get the full real path to the tempdir
         tempdir = temproot.join(basename).realpath()
         if tempdir.exists():
@@ -148,6 +161,18 @@ class TempDir(object):
             return object.__getattribute__(self, name)
         except AttributeError:
             return getattr(self.tempdir, name)
+
+    @pytest.mark.trylast
+    def pytest_tempdir_temproot(self):
+        # Taken from https://github.com/saltstack/salt/blob/v2019.2.0/tests/support/paths.py
+        # Avoid ${TMPDIR} and gettempdir() on MacOS as they yield a base path too long
+        # for unix sockets: ``error: AF_UNIX path too long``
+        # Gentoo Portage prefers ebuild tests are rooted in ${TMPDIR}
+        if not sys.platform.startswith('darwin'):
+            tempdir = os.environ.get('TMPDIR') or tempfile.gettempdir()
+        else:
+            tempdir = '/tmp'
+        return os.path.abspath(os.path.realpath(tempdir))
 
 
 def pytest_configure(config):

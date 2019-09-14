@@ -69,6 +69,16 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2019.9.14
+----------
+
+* Take into account long paths on darwin for the tempdir root
+
+v2019.7.18
+----------
+
+* Lower log level
+
 v2018.8.11
 ~~~~~~~~~~
 
