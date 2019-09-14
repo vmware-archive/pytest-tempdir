@@ -13,9 +13,7 @@
 # Import python libs
 from __future__ import absolute_import
 import os
-import sys
 import logging
-import tempfile
 from functools import partial
 
 # Import py libs
@@ -164,15 +162,7 @@ class TempDir(object):
 
     @pytest.mark.trylast
     def pytest_tempdir_temproot(self):
-        # Taken from https://github.com/saltstack/salt/blob/v2019.2.0/tests/support/paths.py
-        # Avoid ${TMPDIR} and gettempdir() on MacOS as they yield a base path too long
-        # for unix sockets: ``error: AF_UNIX path too long``
-        # Gentoo Portage prefers ebuild tests are rooted in ${TMPDIR}
-        if not sys.platform.startswith('darwin'):
-            tempdir = os.environ.get('TMPDIR') or tempfile.gettempdir()
-        else:
-            tempdir = '/tmp'
-        return os.path.abspath(os.path.realpath(tempdir))
+        return py.path.local.get_temproot()  # pylint: disable=no-member
 
 
 def pytest_configure(config):
