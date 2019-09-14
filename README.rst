@@ -69,6 +69,11 @@ If you encounter any problems, please `file an issue`_ along with a detailed des
 Changelog
 ---------
 
+v2019.9.16
+----------
+
+* Fix hookspec definition
+
 v2019.9.15
 ----------
 

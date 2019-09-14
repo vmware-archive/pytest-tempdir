@@ -27,34 +27,16 @@ try:
 except ImportError:
     from _pytest.monkeypatch import monkeypatch as MonkeyPatch
 
+from pytest_tempdir import hookspec
+
 log = logging.getLogger('pytest.tempdir')
-
-
-class Hooks(object):  # pylint: disable=too-few-public-methods
-    '''
-    Class to add new hooks to pytest
-    '''
-
-    @pytest.hookspec(firstresult=True)
-    def pytest_tempdir_temproot(self):
-        '''
-        An alternate way to define the temporary directory root.
-        '''
-
-    @pytest.hookspec(firstresult=True)
-    def pytest_tempdir_basename(self):
-        '''
-        An alternate way to define the predictable temporary directory.
-        By default returns ``None`` and get's the basename either from the INI file or
-        from the CLI passed option
-        '''
 
 
 def pytest_addhooks(pluginmanager):
     '''
     Register our new hooks
     '''
-    pluginmanager.add_hookspecs(Hooks)
+    pluginmanager.add_hookspecs(hookspec)
 
 
 def pytest_addoption(parser):
@@ -62,11 +44,6 @@ def pytest_addoption(parser):
     Add CLI options to py.test
     '''
     group = parser.getgroup('tempdir', 'Temporary Directory Options')
-#        'Tempdir -\n'
-#        '  Predictable and repeatable temporary directory from where additional\n'
-#        '  temporary directories can be based off. At the start of each test\n'
-#        '  session, if the path exists, IT WILL BE WIPED!'
-#    )
     group.addoption('--tempdir-basename',
                     default=None,
                     help='The predictable temporary directory base name. '
@@ -160,10 +137,6 @@ class TempDir(object):
         except AttributeError:
             return getattr(self.tempdir, name)
 
-    @pytest.mark.trylast
-    def pytest_tempdir_temproot(self):
-        return py.path.local.get_temproot()  # pylint: disable=no-member
-
 
 def pytest_configure(config):
     '''
@@ -171,6 +144,11 @@ def pytest_configure(config):
     '''
     # Prep tempdir
     TempDir(config)
+
+
+@pytest.mark.trylast
+def pytest_tempdir_temproot():
+    return py.path.local.get_temproot()  # pylint: disable=no-member
 
 
 @pytest.fixture(scope='session')
