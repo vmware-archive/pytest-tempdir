@@ -13,6 +13,7 @@
 # Import python libs
 from __future__ import absolute_import
 import os
+import shutil
 import logging
 from functools import partial
 
@@ -93,7 +94,7 @@ class TempDir(object):
         if tempdir.exists():
             # If it exists, it's a stale tempdir. Remove it
             log.warning('Removing stale tempdir: %s', tempdir.strpath)
-            tempdir.remove(rec=True, ignore_errors=True)
+            shutil.rmtree(tempdir.strpath, ignore_errors=True)
         # Make sure the tempdir is created
         tempdir.ensure(dir=True)
         # Store a reference the tempdir for cleanup purposes when ending the test
@@ -113,7 +114,7 @@ class TempDir(object):
         if self.config.getvalue('--tempdir-no-clean') is False:
             log.debug('Cleaning up the tempdir: %s', self.tempdir.strpath)
             try:
-                self.tempdir.remove(rec=True, ignore_errors=True)
+                shutil.rmtree(tempdir.strpath, ignore_errors=True)
             except py.error.ENOENT:  # pylint: disable=no-member
                 pass
         else:
