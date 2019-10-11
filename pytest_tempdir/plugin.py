@@ -114,7 +114,7 @@ class TempDir(object):
         if self.config.getvalue('--tempdir-no-clean') is False:
             log.debug('Cleaning up the tempdir: %s', self.tempdir.strpath)
             try:
-                shutil.rmtree(tempdir.strpath, ignore_errors=True)
+                shutil.rmtree(self.tempdir.strpath, ignore_errors=True)
             except py.error.ENOENT:  # pylint: disable=no-member
                 pass
         else:
